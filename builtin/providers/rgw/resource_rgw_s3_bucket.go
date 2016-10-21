@@ -60,5 +60,19 @@ func resourceRGWS3BucketUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceRGWS3BucketDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] RGW S3 bucket: resourceRGWS3BucketDelete")
+
+	s3conn := meta.(*RGWClient).s3conn
+	if s3conn == nil {
+		return fmt.Errorf("Error grabbing s3conn")
+	}
+
+	bucketName := d.Get("bucket").(string)
+	err := s3conn.RemoveBucket(bucketName)
+	if err != nil {
+		return fmt.Errorf("s3conn.RemoveBucket failed " + err.Error())
+	}
+
+	log.Printf("[DEBUG] Bucket removed successfully.")
+
 	return nil
 }
